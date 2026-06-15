@@ -58,6 +58,10 @@ async function boot() {
     const NAMES = countryNames;
     const POP = population2023;
     const PROJ = projectionData;
+    const collator = new Intl.Collator("de", { sensitivity: "base" });
+    function countryLabel(iso, fallback = "") {
+      return NAMES[iso] || fallback || iso || "Unbekannt";
+    }
 
     const byYear=new Map(TEMP);
     const FIRST=TEMP[0][0],LAST=TEMP[TEMP.length-1][0];
@@ -74,12 +78,29 @@ async function boot() {
     yearInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!goBtn.disabled)revealProlog();});
     goBtn.addEventListener("click",revealProlog);
     function revealProlog(){
-      const birth=+yearInput.value,delta=byYear.get(LAST)-byYear.get(birth),years=LAST-birth;
+      const birth=+yearInput.value;
+      const birthValue=byYear.get(birth);
+      const currentValue=byYear.get(LAST);
+      const delta=currentValue-birthValue;
+      const years=LAST-birth;
       drawPrologStripes(birth);
-      document.getElementById("delta").textContent=de(delta);
-      const childWord = years<=1 ? "Ein heute geborenes Kind k\u00F6nnte eine Welt erleben, die <b>2 bis 3&nbsp;\u00B0C w\u00E4rmer</b> ist als heute."
-        : "Die letzten zehn Jahre waren die <b>w\u00E4rmsten seit Beginn der Messungen</b> \u2014 und sie fielen alle in deine Lebenszeit.";
-      document.getElementById("sentence").innerHTML="In den <b>"+years+" Jahren</b> deines Lebens ist die globale Durchschnitts&shy;temperatur um <b>"+de(delta).replace("+","")+"\u00A0\u00B0C</b> gestiegen \u2014 gegen\u00FCber deinem Geburtsjahr <b>"+birth+"</b>. "+childWord;
+      document.getElementById("delta").textContent=years===0 ? "0,0" : de(delta);
+
+      let sentenceText="";
+      if(years===0){
+        sentenceText="Du hast das aktuellste Jahr der Datenreihe eingegeben: <b>"+birth+"</b>. Deshalb gibt es noch keine Ver\u00E4nderung innerhalb deiner Lebenszeit. Der globale Jahreswert liegt aktuell bei <b>"+de(currentValue)+"&nbsp;\u00B0C</b> gegen\u00FCber dem Mittel 1951&ndash;1980.";
+      }else if(delta>0){
+        sentenceText="Seit deinem Geburtsjahr <b>"+birth+"</b> ist die globale Durchschnitts&shy;temperatur in <b>"+years+" "+(years===1?"Jahr":"Jahren")+"</b> um <b>"+de(delta).replace("+","")+"&nbsp;\u00B0C</b> gestiegen.";
+      }else if(delta<0){
+        sentenceText="Der aktuellste Jahreswert liegt <b>"+de(Math.abs(delta)).replace("+","")+"&nbsp;\u00B0C niedriger</b> als in deinem Geburtsjahr <b>"+birth+"</b>. Das ist keine Trendwende: Einzelne Jahre schwanken, entscheidend ist der langfristige Anstieg der Messreihe.";
+      }else{
+        sentenceText="Der aktuellste Jahreswert liegt ungef\u00E4hr auf dem gleichen Niveau wie in deinem Geburtsjahr <b>"+birth+"</b>. Einzelne Jahre schwanken, entscheidend ist der langfristige Anstieg der Messreihe.";
+      }
+
+      const contextText = years<=1
+        ? " Ein heute geborenes Kind k\u00F6nnte eine Welt erleben, die <b>2 bis 3&nbsp;\u00B0C w\u00E4rmer</b> ist als heute."
+        : " Die letzten zehn Jahre waren die <b>w\u00E4rmsten seit Beginn der Messungen</b> \u2014 und sie fielen alle in deine Lebenszeit.";
+      document.getElementById("sentence").innerHTML=sentenceText+contextText;
       presult.classList.add("on");
       buildLifePath(birth);
     }
@@ -161,7 +182,7 @@ async function boot() {
       });
       drawStripeStrip();
     }
-    /* Warming Stripes: ein Streifen je Jahr, ohne Achsen */
+    /* Klimastreifen: ein Streifen je Jahr, ohne Achsen */
     function drawStripeStrip(){
       const svg=d3.select("#chart-stripes");if(!svg.selectAll("*").empty())return;
       const W=1100,H=70;const x=d3.scaleBand().domain(TEMP.map(d=>d[0])).range([0,W]).padding(0);
@@ -193,7 +214,7 @@ async function boot() {
       const proj=d3.geoNaturalEarth1().fitSize([W,H-30],{type:"FeatureCollection",features:mapData});
       const path=d3.geoPath(proj);
       svg.append("g").selectAll("path").data(mapData).join("path").attr("class","country nodata").attr("d",path)
-        .on("mousemove",function(ev,d){const iso=NUM2ISO[+d.id],yr=+document.getElementById("yearSlider").value;const mt=emByYearIso.get(yr)&&emByYearIso.get(yr).get(iso);const v=(mt!=null)?modeVal(iso,mt):null;const unit=mapMode==="per"?" tCO\u2082e pro Kopf":" MtCO\u2082e";const fmt=mapMode==="per"?".1f":",.0f";tip.innerHTML="<b>"+d.properties.name+"</b><br>"+(v!=null?d3.format(fmt)(v)+unit:"keine Daten");tip.style.left=(ev.clientX+14)+"px";tip.style.top=(ev.clientY-10)+"px";tip.style.opacity=1;}).on("mouseleave",()=>tip.style.opacity=0);
+        .on("mousemove",function(ev,d){const iso=NUM2ISO[+d.id],yr=+document.getElementById("yearSlider").value;const mt=emByYearIso.get(yr)&&emByYearIso.get(yr).get(iso);const v=(mt!=null)?modeVal(iso,mt):null;const unit=mapMode==="per"?" tCO\u2082e pro Kopf":" MtCO\u2082e";const fmt=mapMode==="per"?".1f":",.0f";tip.innerHTML="<b>"+countryLabel(iso, d.properties.name)+"</b><br>"+(v!=null?d3.format(fmt)(v)+unit:"keine Daten");tip.style.left=(ev.clientX+14)+"px";tip.style.top=(ev.clientY-10)+"px";tip.style.opacity=1;}).on("mouseleave",()=>tip.style.opacity=0);
     }
     function updateMap(year){
       document.getElementById("yearLabel").textContent=year;document.getElementById("yearSlider").value=year;
@@ -210,7 +231,7 @@ async function boot() {
       document.getElementById("rankTitle").textContent="Top 5 \u00B7 "+year;
       const unit=mapMode==="per"?" t":"",fmt=mapMode==="per"?".1f":",.0f";
       document.getElementById("rankList").innerHTML=top.map((r,i)=>{
-        const name=NAMES[r[0]]&&NAMES[r[0]].length>3?NAMES[r[0]]:r[0];
+        const name=countryLabel(r[0]);
         return '<div class="rank-row"><span class="pos">'+(i+1)+'</span><span class="nm">'+name+'</span><span class="vl">'+d3.format(fmt)(r[1])+unit+'</span></div>';
       }).join("");
     }
@@ -244,8 +265,8 @@ async function boot() {
     function initFan(){
       if(fanInit)return;fanInit=true;
       const sel=document.getElementById("countrySelect");
-      Object.keys(NAMES).sort((a,b)=>NAMES[a].localeCompare(NAMES[b])).forEach(iso=>{
-        const o=document.createElement("option");o.value=iso;o.textContent=NAMES[iso];sel.appendChild(o);
+      Object.keys(NAMES).sort((a,b)=>collator.compare(countryLabel(a), countryLabel(b))).forEach(iso=>{
+        const o=document.createElement("option");o.value=iso;o.textContent=countryLabel(iso);sel.appendChild(o);
       });
       // Legende
       const leg=document.getElementById("fanLegend");
@@ -283,7 +304,7 @@ async function boot() {
       const worst=data["ssp5-85"]&&data["ssp5-85"]["endcentury_2080_2099"];
       const best=data["ssp2-45"]&&data["ssp2-45"]["endcentury_2080_2099"];
       if(h&&worst){
-        let s="In <b style='color:var(--ink)'>"+NAMES[iso]+"</b> lag die Jahresmitteltemperatur 1986\u20132005 bei rund "+num(h[1],1)+"\u00B0C. "+
+        let s="In <b style='color:var(--ink)'>"+countryLabel(iso)+"</b> lag die Jahresmitteltemperatur 1986\u20132005 bei rund "+num(h[1],1)+"\u00B0C. "+
           "Bei <b>hohen Emissionen</b> steigt sie bis 2080\u20132099 auf bis zu <b>"+num(worst[2],1)+"\u00B0C</b> \u2014 ein Plus von bis zu <b>"+num(worst[2]-h[1],1)+"\u00B0C</b>.";
         if(best){
           s+=" Mit konsequentem <b style='color:var(--blau)'>Klimaschutz</b> lie\u00DFe sich der Anstieg auf rund <b style='color:var(--blau)'>"+num(best[1]-h[1],1)+"\u00B0C</b> begrenzen. Diese Differenz von <b>"+num(worst[2]-best[1],1)+"\u00B0C</b> ist keine Statistik \u2014 sie entscheidet \u00FCber Hitze, Ernten und Lebensqualit\u00E4t einer ganzen Generation.";
