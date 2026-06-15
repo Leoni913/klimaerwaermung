@@ -154,3 +154,46 @@
   .map-controls{gap:.9rem}
   #yearLabel{font-size:1.7rem}
 }
+.back-to-top {
+  position: fixed;
+  right: 1.6rem;
+  bottom: 1.6rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--rot);
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 12px 35px rgba(245, 0, 46, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: #d60027;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 600px) {
+  .back-to-top {
+    right: 1rem;
+    bottom: 1rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+  }
+}
