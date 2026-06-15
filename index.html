@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeitreise durch die globale Erwärmung</title>
+<meta name="description" content="Interaktive Website zur globalen Erwärmung mit Temperaturdaten, Emissionen und Zukunftsszenarien.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#prolog" data-t="prolog"><span>Prolog</span><span class="dot"></span></a>
+  <a href="#akt1" data-t="akt1"><span>Vergangenheit</span><span class="dot"></span></a>
+  <a href="#akt2" data-t="akt2"><span>Gegenwart</span><span class="dot"></span></a>
+  <a href="#akt3" data-t="akt3"><span>Zukunft</span><span class="dot"></span></a>
+  <a href="#akt4" data-t="akt4"><span>Bedeutung</span><span class="dot"></span></a>
+</nav>
+<section id="prolog">
+  <div class="herostripes" id="herostripes"></div>
+  <div class="herofade"></div>
+  <svg class="pstripes" id="pstripes" preserveAspectRatio="none"></svg>
+  <div class="pcontent">
+    <div class="kicker">Eine Zeitreise durch die globale Erw&auml;rmung</div>
+    <h1>In welchem Jahr bist du geboren?</h1>
+    <div class="input-wrap">
+      <input id="year" type="number" min="1880" max="2025" placeholder="19__" inputmode="numeric">
+      <button id="go" disabled>Zeig es mir</button>
+    </div>
+    <div class="hint">Tippe ein Jahr zwischen 1880 und 2025 ein.</div>
+    <div class="legendmini"><span>K&auml;lter</span><span class="bar"></span><span>W&auml;rmer</span></div>
+    <div class="pstats">
+      <div class="pstat card"><div class="v r" id="ps-delta">+1,2&deg;C</div><div class="l">globale Erw&auml;rmung seit 1880</div></div>
+      <div class="pstat card"><div class="v o">+51&nbsp;%</div><div class="l">mehr CO&#8322; in der Atmosph&auml;re seit der Industrialisierung</div></div>
+      <div class="pstat card"><div class="v b" id="ps-warm">10</div><div class="l">w&auml;rmsten Jahre lagen allesamt in den letzten 11&nbsp;Jahren</div></div>
+      <div class="pstat card"><div class="v r">2024</div><div class="l">w&auml;rmstes Jahr der Messgeschichte</div></div>
+    </div>
+    <div id="presult">
+      <div class="big"><span id="delta">+0,0</span><span class="unit">&deg;C</span></div>
+      <p class="sentence" id="sentence"></p>
+    </div>
+    <div id="lifepath">
+      <div class="lp-title">Dein pers&ouml;nlicher Klima-Lebensweg</div>
+      <div class="lp-track" id="lpTrack"></div>
+      <p class="lp-note">Werte als Abweichung vom Mittel 1951&ndash;1980. Die beiden letzten Punkte sind <b>Projektionen</b> f&uuml;r ein Szenario mit weiterhin hohen Emissionen &mdash; sie sind kein Schicksal, sondern eine von vielen m&ouml;glichen Zukunft.</p>
+    </div>
+  </div>
+  <a href="#akt1" class="scrollcue">&darr; Weiter zur Reise</a>
+</section>
+<section id="akt1">
+  <div class="reveal">
+    <div class="kicker"><span class="akt-no">Akt I</span> &nbsp;&middot;&nbsp; Die Vergangenheit</div>
+    <h2>146 Jahre, in einer Linie.</h2>
+    <p class="body">Seit 1880 misst die NASA die globale Durchschnitts&shy;temperatur. Jede Schwankung ist hier ein Jahr &mdash; und der Anstieg der letzten Jahrzehnte ist un&uuml;bersehbar. Die Nulllinie markiert das Mittel der Jahre 1951&ndash;1980. Fahre &uuml;ber die Punkte, um wichtige Wegmarken zu sehen.</p>
+  </div>
+  <div class="chart-wrap card reveal"><svg id="chart-temp" viewBox="0 0 1100 460"></svg></div>
+  <div class="stripes-wrap reveal">
+    <div class="lbl"><span>1880</span><span>Warming Stripes &middot; ein Streifen je Jahr</span><span>2025</span></div>
+    <svg id="chart-stripes" viewBox="0 0 1100 70" preserveAspectRatio="none"></svg>
+    <p class="stripes-cap">Dieselben Daten ohne Achsen: Jeder Streifen ist ein Jahr, die Farbe seine Temperatur. Von tiefem Blau zu sattem Rot &mdash; die Klimaerw&auml;rmung auf einen Blick.</p>
+  </div>
+</section>
+<section id="akt2" class="akt-bg">
+  <div class="reveal">
+    <div class="kicker"><span class="akt-no">Akt II</span> &nbsp;&middot;&nbsp; Die Gegenwart</div>
+    <h2>Wer heizt der Erde ein?</h2>
+    <p class="body">Treibhausgas-Emissionen pro Land. Bewege den Regler oder dr&uuml;cke Play, um die Entwicklung von 1990 bis 2023 zu durchlaufen. Wechsle zwischen <b>Gesamt&shy;ausstoß</b> und <b>Pro&nbsp;Kopf</b> &mdash; das ver&auml;ndert das Bild dramatisch.</p>
+  </div>
+  <div class="map-wrap card reveal" id="akt2-wrap">
+    <div class="map-controls">
+      <button id="playBtn" aria-label="Abspielen">&#9654;</button>
+      <span id="yearLabel">1990</span>
+      <input id="yearSlider" type="range" min="1990" max="2023" value="1990" step="1">
+      <div class="toggle" role="group" aria-label="Darstellungsmodus">
+        <button id="modeTotal" class="active">Gesamt</button>
+        <button id="modePer">Pro Kopf</button>
+      </div>
+    </div>
+    <div class="map-layout">
+      <div>
+        <svg id="chart-map" viewBox="0 0 1100 560"></svg>
+        <div class="map-status" id="mapStatus"></div>
+      </div>
+      <div class="rank-panel card">
+        <h4 id="rankTitle">Top 5 &middot; 1990</h4>
+        <div id="rankList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="akt3">
+  <div class="reveal">
+    <div class="kicker"><span class="akt-no">Akt III</span> &nbsp;&middot;&nbsp; Die Zukunft</div>
+    <h2>Welche Zukunft w&auml;hlen wir?</h2>
+    <p class="body">W&auml;hle ein Land und sieh, wie warm es im Jahresmittel wird &mdash; unter drei m&ouml;glichen Pfaden: <b style="color:var(--blau)">Klimaschutz</b>, <b style="color:var(--orange)">Mittlerer&nbsp;Pfad</b> und <b style="color:var(--rot)">Hohe&nbsp;Emissionen</b>. Das schattierte Band zeigt die Unsicherheit, die Linie den wahrscheinlichsten Wert.</p>
+  </div>
+  <div class="fan-wrap card reveal" id="akt3-wrap">
+    <div class="fan-controls">
+      <label for="countrySelect">Land</label>
+      <select id="countrySelect"></select>
+    </div>
+    <div class="fan-legend" id="fanLegend"></div>
+    <svg id="chart-fan" viewBox="0 0 1100 500"></svg>
+    <p id="fanSentence"></p>
+  </div>
+</section>
+<section id="akt4">
+  <div class="reveal">
+    <div class="kicker"><span class="akt-no">Akt IV</span> &nbsp;&middot;&nbsp; Was bedeutet das f&uuml;r uns?</div>
+    <h2>Mehr als eine Zahl auf einer Skala.</h2>
+    <p class="body">Jedes Zehntelgrad ver&auml;ndert, wie wir leben. Steigen die Emissionen ungebremst weiter und steuern wir auf eine Welt zu, die rund <b style="color:var(--rot)">4&nbsp;&deg;C</b> w&auml;rmer ist als vor der Industrialisierung, bedeutet das konkret:</p>
+    <div class="conseq">
+      <div class="c card"><span class="ic">&#127777;</span><div class="ct">Mehr Hitzetage</div><div class="cd">Hitzewellen werden l&auml;nger, h&auml;ufiger und gef&auml;hrlicher &mdash; besonders f&uuml;r St&auml;dte und &auml;ltere Menschen.</div></div>
+      <div class="c card"><span class="ic">&#127759;</span><div class="ct">Mehr D&uuml;rren</div><div class="cd">Trockenperioden bedrohen Ernten, Trinkwasser und ganze &Ouml;kosysteme &mdash; auch in Mitteleuropa.</div></div>
+      <div class="c card"><span class="ic">&#127783;</span><div class="ct">Mehr Starkregen</div><div class="cd">W&auml;rmere Luft speichert mehr Feuchtigkeit. Die Folge: heftigere Unwetter und &Uuml;berflutungen.</div></div>
+      <div class="c card"><span class="ic">&#127754;</span><div class="ct">Steigender Meeresspiegel</div><div class="cd">Schmelzendes Eis l&auml;sst die Ozeane steigen und bedroht K&uuml;sten, in denen Millionen Menschen leben.</div></div>
+    </div>
+    <div class="closing reveal">
+      <div class="big">Die Zukunft ist <em>nicht festgeschrieben.</em></div>
+      <p>Jeder der gezeigten Pfade ist eine Entscheidung &mdash; getroffen in den kommenden Jahren und Jahrzehnten. Welche Linie am Ende Wirklichkeit wird, h&auml;ngt von uns ab.</p>
+    </div>
+  </div>
+</section>
+<footer>
+  <b>Datenquellen:</b> NASA GISTEMP v4 &middot; NOAA (CO&#8322; Mauna Loa, Billion-Dollar Disasters) &middot; ClimateWatch / World Bank (Emissionen) &middot; Climate Impact Lab (Projektionen) &middot; Our World in Data &middot; L&auml;ndergrenzen: world-atlas (Natural Earth).<br>
+  erstellt f&uuml;r Medienmanagement 6. Semester, Modul Interaktive Medien &mdash; Projekt &bdquo;Zeitreise durch die globale Erw&auml;rmung&ldquo;. &nbsp;|&nbsp; Datenquellen: als JSON-Dateien im Ordner <code>data/</code> ausgelagert.
+</footer>
+<div class="tip" id="tip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="main.js"></script>
+</body>
+</html>
