@@ -323,9 +323,17 @@ async function boot() {
     const navIO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)navLinks.forEach(a=>a.classList.toggle("active",a.dataset.t===e.target.id));});},{threshold:.5});
     document.querySelectorAll("section").forEach(s=>navIO.observe(s));
     yearInput.focus();
-  } catch (error) {
-    showDataError(error);
-  }
+} catch (error) {
+  showDataError(error);
+}
+}
+
+const backToTop = document.getElementById("backToTop");
+
+if (backToTop) {
+  window.addEventListener("scroll", () => {
+    backToTop.classList.toggle("show", window.scrollY > 600);
+  });
 }
 
 boot();
