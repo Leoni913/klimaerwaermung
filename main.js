@@ -330,10 +330,18 @@ async function boot() {
 
 const backToTop = document.getElementById("backToTop");
 
-if (backToTop) {
-  window.addEventListener("scroll", () => {
-    backToTop.classList.toggle("show", window.scrollY > 600);
-  });
+function toggleBackToTop() {
+  if (!backToTop) return;
+
+  if (window.scrollY > 300) {
+    backToTop.classList.add("show");
+  } else {
+    backToTop.classList.remove("show");
+  }
 }
+
+window.addEventListener("scroll", toggleBackToTop, { passive: true });
+window.addEventListener("load", toggleBackToTop);
+toggleBackToTop();
 
 boot();
