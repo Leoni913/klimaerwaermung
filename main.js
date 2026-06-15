@@ -326,3 +326,11 @@ async function boot() {
 }
 
 boot();
+
+const backToTop = document.getElementById("backToTop");
+
+if (backToTop) {
+  window.addEventListener("scroll", () => {
+    backToTop.classList.toggle("show", window.scrollY > 600);
+  });
+}
